@@ -1,0 +1,381 @@
+// 江苏国动便民小程序 - 后台管理端数据库模型
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============ 系统管理模块 ============
+
+// 用户
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  password    String
+  realName    String
+  unit        String?
+  phone       String?
+  role        String   @default("viewer") // admin, province, city, district, editor, auditor
+  status      String   @default("active") // active, disabled, deleted
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  auditTasks      AuditTask[]
+  auditRecords    AuditRecord[]
+  operationLogs   OperationLog[]
+  announcements   Announcement[]
+  reservations     ParkingReservation[]
+  rentals          ParkingRental[]
+}
+
+// 系统参数
+model SystemParam {
+  id          Int      @id @default(autoincrement())
+  category    String   // map, sms, payment, booking, dictionary
+  paramName   String
+  paramValue  String
+  paramDesc   String?
+  status      String   @default("active")
+  version     Int      @default(1)
+  effectTime  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 操作日志
+model OperationLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  module      String
+  action      String   // create, update, delete, import, export, audit_pass, audit_reject
+  target      String
+  detail      String?  // JSON string of before/after
+  ip          String?
+  result      String   @default("success") // success, fail
+  createdAt   DateTime @default(now())
+}
+
+// 公告
+model Announcement {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  type        String   // system_notice, service_notice, policy_publicity
+  scope       String   // public, admin
+  region      String?  // province, city, district code
+  status      String   @default("draft") // draft, published, offline, deleted
+  publishTime DateTime?
+  createdBy   Int
+  creator     User     @relation(fields: [createdBy], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============ 数据管理模块 ============
+
+// 人防工程
+model CivilAirDefenseProject {
+  id            Int      @id @default(autoincrement())
+  name          String
+  code          String   @unique
+  longitude     Float
+  latitude      Float
+  area          Float?   // 建筑面积
+  buildType     String?  // 建设类型
+  projectType   String?  // 工程类别
+  capacity      Int?     // 最大可容纳人数
+  peacetimeUse  String?  // 平时用途
+  manageUnit    String?  // 管理单位
+  region        String?  // 所在区域
+  status        String   @default("published") // draft, pending, published, deleted
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  servicePoints   ConvenienceServicePoint[]
+  parkingSpaces   ParkingSpace[]
+  reservations    ParkingReservation[]
+  rentals         ParkingRental[]
+}
+
+// 纳凉点
+model CoolingSpot {
+  id            Int      @id @default(autoincrement())
+  name          String
+  address       String
+  longitude     Float
+  latitude      Float
+  openTime      String?  // 开放时间
+  servicePeriod  String?  // 服务期限
+  facilities    String?   // 服务设施 (JSON array)
+  capacity      Int?      // 容纳人数上限
+  manageUnit    String?
+  contactPhone  String?
+  region        String?
+  status        String   @default("active") // active, closed, deleted
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 便民服务点
+model ConvenienceServicePoint {
+  id            Int      @id @default(autoincrement())
+  name          String
+  address       String
+  longitude     Float
+  latitude      Float
+  projectId     Int?
+  project       CivilAirDefenseProject? @relation(fields: [projectId], references: [id])
+  serviceType   String?  // 服务类型
+  businessHours String?  // 营业时间
+  contactPhone  String?
+  description   String?  // 服务简介
+  region        String?
+  status        String   @default("published") // draft, pending, published, offline, deleted
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 人防车位
+model ParkingSpace {
+  id              Int      @id @default(autoincrement())
+  projectId       Int?
+  project         CivilAirDefenseProject? @relation(fields: [projectId], references: [id])
+  location        String   // 车位位置
+  totalSpaces     Int      @default(0)   // 总车位数
+  bookableSpaces  Int      @default(0)   // 可预约车位数
+  rentableSpaces  Int      @default(0)   // 可租赁车位数
+  priceStandard   String?  // 收费标准
+  areaType        String?  // 重点区域类型
+  manageUnit      String?
+  contactPhone    String?
+  region          String?
+  status          String   @default("published") // draft, pending, published, deleted
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  reservations    ParkingReservation[]
+  rentals         ParkingRental[]
+}
+
+// 宣教体验馆
+model EducationMuseum {
+  id            Int      @id @default(autoincrement())
+  name          String
+  address       String
+  longitude     Float
+  latitude      Float
+  intro         String?  // 简介
+  openTime      String?
+  experienceItems String? // 体验项目 (JSON array)
+  visitNotice   String?  // 参观须知
+  capacity      Int?
+  bookingRule    String?  // 预约规则
+  contactPhone  String?
+  region        String?
+  status        String   @default("published")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 警报音频
+model AlarmAudio {
+  id          Int      @id @default(autoincrement())
+  signalType  String   // pre_alarm, air_raid, all_clear (预先/空袭/解除)
+  fileName    String
+  filePath    String
+  fileSize    Int?
+  duration    Float?
+  status      String   @default("pending") // pending, published, revoked, deleted
+  createdBy   Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 警报信号文字说明
+model AlarmSignalText {
+  id          Int      @id @default(autoincrement())
+  signalType  String   // pre_alarm, air_raid, all_clear
+  rhythm      String?  // 鸣响规律
+  meaning     String?  // 含义解释
+  response    String?  // 响应要求
+  status      String   @default("published")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 防护知识
+model ProtectionKnowledge {
+  id          Int      @id @default(autoincrement())
+  signalType  String?
+  title       String
+  content     String    // 防护措施和行动指南
+  images      String?   // 图示 (JSON array of paths)
+  status      String   @default("published")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============ 数据审核模块 ============
+
+// 审核流程
+model AuditProcess {
+  id            Int      @id @default(autoincrement())
+  name          String
+  dataType      String   // project, cooling, service, parking, museum, audio
+  levels        Int      @default(1) // 审核层级
+  nodes         String   // JSON: [{level, roleName, timeout}]
+  flowRule      String   @default("sequential") // sequential, countersign
+  status        String   @default("inactive") // active, inactive
+  version       Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tasks         AuditTask[]
+}
+
+// 审核任务
+model AuditTask {
+  id            Int      @id @default(autoincrement())
+  processId     Int
+  process       AuditProcess @relation(fields: [processId], references: [id])
+  dataType      String
+  dataId        Int
+  dataSummary   String
+  submitterId   Int
+  submitter     User     @relation(fields: [submitterId], references: [id])
+  currentNode   Int      @default(1)
+  status        String   @default("pending") // pending, approved, rejected, returned
+  submitTime    DateTime @default(now())
+  completeTime  DateTime?
+
+  records       AuditRecord[]
+}
+
+// 审核记录
+model AuditRecord {
+  id            Int      @id @default(autoincrement())
+  taskId        Int
+  task          AuditTask @relation(fields: [taskId], references: [id])
+  auditorId     Int
+  auditor       User     @relation(fields: [auditorId], references: [id])
+  node          Int      // 审核节点
+  action        String   // pass, return, reject
+  opinion       String?
+  createdAt     DateTime @default(now())
+}
+
+// ============ 预约及租赁管理模块 ============
+
+// 车位预约
+model ParkingReservation {
+  id            Int      @id @default(autoincrement())
+  reservationNo String   @unique
+  parkingId     Int
+  parking       ParkingSpace @relation(fields: [parkingId], references: [id])
+  projectId     Int?
+  project       CivilAirDefenseProject? @relation(fields: [projectId], references: [id])
+  userId        Int?
+  user          User?    @relation(fields: [userId], references: [id])
+  userName      String
+  userPhone     String
+  plateNumber   String?
+  reserveDate   DateTime
+  startTime     String   // 时段开始
+  endTime       String   // 时段结束
+  status        String   @default("reserved") // reserved, used, expired, cancelled
+  submitTime    DateTime @default(now())
+  arriveTime    DateTime?
+  leaveTime     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 车位租赁
+model ParkingRental {
+  id            Int      @id @default(autoincrement())
+  rentalNo      String   @unique
+  parkingId     Int
+  parking       ParkingSpace @relation(fields: [parkingId], references: [id])
+  projectId     Int?
+  project       CivilAirDefenseProject? @relation(fields: [projectId], references: [id])
+  userId        Int?
+  user          User?    @relation(fields: [userId], references: [id])
+  applicantName String
+  applicantPhone String
+  idCard        String?
+  leasePrice    Float
+  leasePeriod   String?  // 租赁期限
+  leaseConditions String?
+  startDate     DateTime?
+  endDate       DateTime?
+  status        String   @default("pending") // pending, reviewing, approved, rejected, active, expired, terminated
+  submitTime    DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 预约规则
+model BookingRule {
+  id            Int      @id @default(autoincrement())
+  ruleType      String   // parking, museum
+  name          String
+  advanceDays   Int      @default(7)     // 预约提前期
+  slotDuration  Int      @default(60)    // 时段划分(分钟)
+  timeoutRelease Int     @default(30)   // 超时释放时间(分钟)
+  cancelLimit   Int      @default(120)  // 取消时限(分钟)
+  maxBooking    Int      @default(1)    // 预约上限
+  targetType    String?  // 适用对象
+  targetId      Int?     // 适用对象ID
+  status        String   @default("inactive") // active, inactive
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ 统计分析模块 ============
+
+// 用户访问日志
+model UserAccessLog {
+  id          Int      @id @default(autoincrement())
+  userId      String?  // 小程序用户ID
+  source      String?  // 访问来源
+  region      String?  // 访问地域
+  accessTime  DateTime @default(now())
+}
+
+// 资源查询日志
+model ResourceQueryLog {
+  id          Int      @id @default(autoincrement())
+  resourceType String  // project, cooling, service, parking, museum
+  resourceId  Int?
+  keyword     String?
+  queryTime   DateTime @default(now())
+}
+
+// 报表模板
+model ReportTemplate {
+  id          Int      @id @default(autoincrement())
+  name        String
+  type        String   // daily, weekly, monthly, yearly
+  metrics     String   // JSON array of metric keys
+  format      String   @default("pdf") // pdf, excel
+  pushConfig  String?  // JSON: {cron, receivers}
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 报表记录
+model ReportRecord {
+  id          Int      @id @default(autoincrement())
+  templateId  Int?
+  name        String
+  period      String   // 统计周期描述
+  filePath    String?
+  format      String   @default("pdf")
+  createdBy   Int?
+  createdAt   DateTime @default(now())
+}
