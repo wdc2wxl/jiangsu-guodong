@@ -179,7 +179,7 @@ const LoginPage = () => {
           {/* 底部信息（在背景图上方） */}
           <div style={{ textAlign: 'center' }}>
             <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>
-              江苏省国防动员办公室 · 技术支持：江苏国动信息科技有限公司
+              江苏省国防动员办公室 · 技术支持：江苏兆伟智能科技有限公司
             </div>
             <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 4 }}>
               建议使用 1920×1080 分辨率浏览本系统
@@ -351,7 +351,7 @@ const LoginPage = () => {
       >
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>
-            江苏省国防动员办公室 · 技术支持：江苏国动信息科技有限公司
+            江苏省国防动员办公室 · 技术支持：江苏兆伟智能科技有限公司
           </div>
           <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>
             建议使用 1920×1080 分辨率浏览本系统
