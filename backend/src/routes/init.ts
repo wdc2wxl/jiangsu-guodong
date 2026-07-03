@@ -7,7 +7,8 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // 数据库初始化 - 首次部署后调用一次
-router.post('/', async (req, res) => {
+// 同时支持 GET 和 POST，方便浏览器直接访问
+const doInit = async (req: any, res: any) => {
   try {
     // 1. 执行 prisma db push 创建表结构
     console.log('🔄 开始同步数据库结构...');
@@ -254,6 +255,9 @@ router.post('/', async (req, res) => {
   } finally {
     await prisma.$disconnect();
   }
-});
+};
+
+router.post('/', doInit);
+router.get('/', doInit);
 
 export default router;
