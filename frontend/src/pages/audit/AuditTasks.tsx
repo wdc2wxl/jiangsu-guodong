@@ -9,12 +9,23 @@ import {
   Select,
   Tag,
   message,
-  Descriptions,
+  Card,
   Divider,
   Radio,
+  Row,
+  Col,
+  Avatar,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { EyeOutlined } from '@ant-design/icons';
+import {
+  EyeOutlined,
+  UserOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  RollbackOutlined,
+  FileTextOutlined,
+  ClockCircleOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '@/services/api';
 import PageContainer from '@/components/PageContainer';
@@ -235,93 +246,223 @@ const AuditTasks = () => {
       </div>
 
       <Modal
-        title="审核详情"
+        title={
+          <div style={{ fontSize: 18, fontWeight: 600 }}>
+            <FileTextOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+            审核详情
+          </div>
+        }
         open={detailModalOpen}
         onOk={detailRecord?.status === 'pending' ? handleAudit : undefined}
         onCancel={() => setDetailModalOpen(false)}
-        width={700}
+        width={620}
         confirmLoading={submitting}
         okText="提交审核"
         cancelText="关闭"
         destroyOnClose
+        maskStyle={{ background: 'rgba(0,0,0,0.5)' }}
+        centered
       >
         {detailRecord && (
-          <>
-            <Descriptions title="数据信息" bordered column={2} size="small">
-              <Descriptions.Item label="数据类型">
-                {dataTypeLabel(detailRecord.dataType)}
-              </Descriptions.Item>
-              <Descriptions.Item label="数据ID">{detailRecord.dataId || '-'}</Descriptions.Item>
-              <Descriptions.Item label="摘要" span={2}>{detailRecord.dataSummary || '-'}</Descriptions.Item>
-              <Descriptions.Item label="提交人">
-                {detailRecord.submitter?.realName || detailRecord.submitter?.username || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="提交时间">
-                {detailRecord.submitTime ? dayjs(detailRecord.submitTime).format('YYYY-MM-DD HH:mm:ss') : '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="审核流程">
-                {detailRecord.process?.name || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="当前节点">
-                第 {detailRecord.currentNode || 1} / {detailRecord.process?.levels || 1} 节点
-              </Descriptions.Item>
-              <Descriptions.Item label="当前状态" span={2}>
-                {(() => {
-                  const config = statusMap[detailRecord.status] || { label: detailRecord.status, color: 'default' };
-                  return <Tag color={config.color}>{config.label}</Tag>;
-                })()}
-              </Descriptions.Item>
-            </Descriptions>
+          <div style={{ padding: '8px 0' }}>
+            {/* ========== 数据信息 ========== */}
+            <div
+              style={{
+                background: '#f6f8fc',
+                borderRadius: 10,
+                padding: '20px 24px',
+                marginBottom: 24,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: '#1a1a2e',
+                  marginBottom: 16,
+                  paddingLeft: 10,
+                  borderLeft: '3px solid #1890ff',
+                }}
+              >
+                数据信息
+              </div>
+              <Row gutter={[24, 14]}>
+                <Col span={12}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>数据类型</div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: '#333' }}>
+                    {dataTypeLabel(detailRecord.dataType)}
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>数据ID</div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: '#333' }}>
+                    {detailRecord.dataId || '-'}
+                  </div>
+                </Col>
+                <Col span={24}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>摘要</div>
+                  <div style={{ fontSize: 14, color: '#333' }}>{detailRecord.dataSummary || '-'}</div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>提交人</div>
+                  <div style={{ fontSize: 14, color: '#333' }}>
+                    {detailRecord.submitter?.realName || detailRecord.submitter?.username || '-'}
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>提交时间</div>
+                  <div style={{ fontSize: 14, color: '#333' }}>
+                    <ClockCircleOutlined style={{ marginRight: 4, color: '#999' }} />
+                    {detailRecord.submitTime ? dayjs(detailRecord.submitTime).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>审核流程</div>
+                  <div style={{ fontSize: 14, color: '#333' }}>
+                    {detailRecord.process?.name || '-'}
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>当前节点</div>
+                  <div style={{ fontSize: 14, color: '#333' }}>
+                    第 {detailRecord.currentNode || 1} / {detailRecord.process?.levels || 1} 节点
+                  </div>
+                </Col>
+                <Col span={24}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>当前状态</div>
+                  <div>
+                    {(() => {
+                      const config = statusMap[detailRecord.status] || { label: detailRecord.status, color: 'default' };
+                      return (
+                        <Tag
+                          color={config.color}
+                          style={{ fontSize: 13, padding: '2px 12px', borderRadius: 12 }}
+                        >
+                          {config.label}
+                        </Tag>
+                      );
+                    })()}
+                  </div>
+                </Col>
+              </Row>
+            </div>
 
-            {/* 历史审核记录 */}
+            {/* ========== 审核记录 ========== */}
             {detailRecord.records && detailRecord.records.length > 0 && (
               <>
-                <Divider>审核记录</Divider>
-                {detailRecord.records.map((rec: any, i: number) => {
-                  const cfg = actionLabelMap[rec.action] || { label: rec.action, color: 'default' };
-                  return (
-                    <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span>
-                          <Tag color={cfg.color}>{cfg.label}</Tag>
-                          <span style={{ marginLeft: 8, fontWeight: 500 }}>
-                            {rec.auditor?.realName || rec.auditor?.username || '-'}
-                          </span>
-                        </span>
-                        <span style={{ fontSize: 12, color: '#999' }}>
-                          {rec.createdAt ? dayjs(rec.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
-                        </span>
+                <Divider style={{ margin: '16px 0', fontSize: 13, color: '#999' }}>
+                  审核记录
+                </Divider>
+                <div style={{ marginBottom: 16 }}>
+                  {detailRecord.records.map((rec: any, i: number) => {
+                    const cfg = actionLabelMap[rec.action] || { label: rec.action, color: 'default' };
+                    return (
+                      <div
+                        key={i}
+                        style={{
+                          display: 'flex',
+                          gap: 12,
+                          padding: '14px 0',
+                          borderBottom: i < detailRecord.records.length - 1 ? '1px solid #f0f0f0' : 'none',
+                        }}
+                      >
+                        <Avatar
+                          size="small"
+                          icon={<UserOutlined />}
+                          style={{ background: '#e6f0ff', color: '#1890ff', flexShrink: 0 }}
+                        />
+                        <div style={{ flex: 1 }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              marginBottom: 6,
+                            }}
+                          >
+                            <span style={{ fontSize: 14, fontWeight: 500, color: '#333' }}>
+                              {rec.auditor?.realName || rec.auditor?.username || '-'}
+                              <Tag
+                                color={cfg.color}
+                                style={{ marginLeft: 8, fontSize: 12, padding: '0 8px', borderRadius: 4 }}
+                              >
+                                {cfg.label}
+                              </Tag>
+                            </span>
+                            <span style={{ fontSize: 12, color: '#bbb' }}>
+                              {rec.createdAt ? dayjs(rec.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                            </span>
+                          </div>
+                          {rec.opinion && (
+                            <div
+                              style={{
+                                background: '#f8f9fc',
+                                borderRadius: 6,
+                                padding: '10px 14px',
+                                fontSize: 13,
+                                color: '#666',
+                                fontStyle: 'italic',
+                              }}
+                            >
+                              "{rec.opinion}"
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      {rec.opinion && <div style={{ color: '#666', marginTop: 4, fontSize: 13 }}>{rec.opinion}</div>}
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </>
             )}
 
-            {/* 审核操作表单 - 仅 pending 状态显示 */}
+            {/* ========== 审核操作 ========== */}
             {detailRecord.status === 'pending' && (
               <>
-                <Divider>审核操作</Divider>
+                <Divider style={{ margin: '16px 0', fontSize: 13, color: '#999' }}>
+                  审核操作
+                </Divider>
                 <Form form={auditForm} layout="vertical">
-                  <Form.Item name="result" label="审核结果" rules={[{ required: true, message: '请选择审核结果' }]}>
-                    <Radio.Group>
-                      <Radio value="approved">通过</Radio>
-                      <Radio value="returned">退回</Radio>
-                      <Radio value="rejected">驳回</Radio>
+                  <Form.Item
+                    name="result"
+                    label={<span style={{ fontWeight: 500 }}>审核结果</span>}
+                    rules={[{ required: true, message: '请选择审核结果' }]}
+                  >
+                    <Radio.Group style={{ display: 'flex', gap: 24 }}>
+                      <Radio value="approved">
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                          通过
+                        </span>
+                      </Radio>
+                      <Radio value="returned">
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <RollbackOutlined style={{ color: '#fa8c16' }} />
+                          退回
+                        </span>
+                      </Radio>
+                      <Radio value="rejected">
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <CloseCircleOutlined style={{ color: '#ff4d4f' }} />
+                          驳回
+                        </span>
+                      </Radio>
                     </Radio.Group>
                   </Form.Item>
                   <Form.Item
                     name="comment"
-                    label="审核意见"
+                    label={<span style={{ fontWeight: 500 }}>审核意见</span>}
                     rules={[{ required: true, message: '请输入审核意见' }]}
                   >
-                    <Input.TextArea rows={3} placeholder="请输入审核意见" />
+                    <Input.TextArea
+                      rows={3}
+                      placeholder="请输入审核意见"
+                      style={{ borderRadius: 8, resize: 'none' }}
+                    />
                   </Form.Item>
                 </Form>
               </>
             )}
-          </>
+          </div>
         )}
       </Modal>
     </PageContainer>

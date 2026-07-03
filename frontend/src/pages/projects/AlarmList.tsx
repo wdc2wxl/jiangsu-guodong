@@ -27,27 +27,29 @@ import Toolbar from '@/components/Toolbar';
 
 interface AlarmAudio {
   id: number;
-  name: string;
-  type: string;
+  name?: string;
+  type?: string;
   fileName: string;
-  fileSize: string;
-  duration: string;
+  signalType?: string;
+  fileSize?: number;
+  duration?: number;
   status: string;
 }
 
 interface SignalText {
   id: number;
-  title: string;
+  title?: string;
   signalType: string;
-  content: string;
+  content?: string;
+  meaning?: string;
   status: string;
 }
 
 interface Knowledge {
   id: number;
-  title: string;
-  category: string;
-  content: string;
+  title?: string;
+  signalType?: string;
+  content?: string;
   status: string;
 }
 
@@ -67,10 +69,18 @@ const alarmTypeOptions = [
 ];
 
 const knowledgeCategoryOptions = [
-  { label: '防护知识', value: '防护知识' },
-  { label: '应急常识', value: '应急常识' },
-  { label: '自救互救', value: '自救互救' },
+  { label: '防护知识', value: 'general' },
+  { label: '预先警报', value: 'pre_alarm' },
+  { label: '空袭警报', value: 'air_raid' },
+  { label: '解除警报', value: 'all_clear' },
 ];
+
+const signalTypeLabelMap: Record<string, string> = {
+  general: '防护知识',
+  pre_alarm: '预先警报',
+  air_raid: '空袭警报',
+  all_clear: '解除警报',
+};
 
 const AlarmList = () => {
   const [activeTab, setActiveTab] = useState('audio');
@@ -328,10 +338,10 @@ const AlarmList = () => {
   };
 
   const audioColumns: ColumnsType<AlarmAudio> = [
-    { title: '名称', dataIndex: 'name', key: 'name', ellipsis: true, width: 180 },
-    { title: '类型', dataIndex: 'type', key: 'type', width: 120 },
+    { title: '名称', dataIndex: 'fileName', key: 'fileName', ellipsis: true, width: 180 },
+    { title: '类型', dataIndex: 'signalType', key: 'signalType', width: 120 },
     { title: '文件名', dataIndex: 'fileName', key: 'fileName', ellipsis: true, width: 200 },
-    { title: '文件大小', dataIndex: 'fileSize', key: 'fileSize', width: 100 },
+    { title: '文件大小', dataIndex: 'fileSize', key: 'fileSize', width: 100, render: (size: number) => size ? `${(size / 1024).toFixed(1)} KB` : '-' },
     { title: '时长', dataIndex: 'duration', key: 'duration', width: 100 },
     {
       title: '状态',
@@ -378,9 +388,8 @@ const AlarmList = () => {
   ];
 
   const signalColumns: ColumnsType<SignalText> = [
-    { title: '标题', dataIndex: 'title', key: 'title', ellipsis: true, width: 200 },
-    { title: '信号类型', dataIndex: 'signalType', key: 'signalType', width: 120 },
-    { title: '内容', dataIndex: 'content', key: 'content', ellipsis: true },
+    { title: '信号类型', dataIndex: 'signalType', key: 'signalType', ellipsis: true, width: 200 },
+    { title: '含义', dataIndex: 'meaning', key: 'meaning', ellipsis: true },
     {
       title: '状态',
       dataIndex: 'status',
@@ -427,7 +436,13 @@ const AlarmList = () => {
 
   const knowledgeColumns: ColumnsType<Knowledge> = [
     { title: '标题', dataIndex: 'title', key: 'title', ellipsis: true, width: 200 },
-    { title: '分类', dataIndex: 'category', key: 'category', width: 120 },
+    {
+      title: '分类',
+      dataIndex: 'signalType',
+      key: 'signalType',
+      width: 120,
+      render: (val: string) => signalTypeLabelMap[val] || val || '-',
+    },
     { title: '内容', dataIndex: 'content', key: 'content', ellipsis: true },
     {
       title: '状态',
@@ -640,7 +655,7 @@ const AlarmList = () => {
           <Form.Item name="title" label="标题" rules={[{ required: true, message: '请输入标题' }]}>
             <Input placeholder="请输入标题" />
           </Form.Item>
-          <Form.Item name="category" label="分类" rules={[{ required: true, message: '请选择分类' }]}>
+          <Form.Item name="signalType" label="分类" rules={[{ required: true, message: '请选择分类' }]}>
             <Select placeholder="请选择" options={knowledgeCategoryOptions} />
           </Form.Item>
           <Form.Item name="content" label="内容" rules={[{ required: true, message: '请输入内容' }]}>

@@ -243,8 +243,21 @@ const AdminLayout = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider trigger={null} collapsible collapsed={collapsed} width={220}>
+    <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
+      <Sider
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        width={240}
+        style={{
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          zIndex: 100,
+          overflow: 'auto',
+        }}
+      >
         <div className="logo">
           {collapsed ? '国动' : '江苏国动便民后台'}
         </div>
@@ -257,7 +270,14 @@ const AdminLayout = () => {
           onClick={handleMenuClick}
         />
       </Sider>
-      <Layout>
+      <Layout
+        style={{
+          marginLeft: collapsed ? 80 : 240,
+          height: '100vh',
+          overflowY: 'auto',
+          transition: 'margin-left 0.2s',
+        }}
+      >
         <Header
           style={{
             padding: '0 24px',
@@ -265,6 +285,9 @@ const AdminLayout = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            position: 'sticky',
+            top: 0,
+            zIndex: 50,
           }}
         >
           <Space>
@@ -294,7 +317,6 @@ const AdminLayout = () => {
             padding: 0,
             background: colorBgContainer,
             minHeight: 280,
-            overflow: 'auto',
           }}
         >
           <Outlet />

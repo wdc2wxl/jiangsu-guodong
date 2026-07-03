@@ -26,8 +26,8 @@ interface AuditProcessItem {
   id: number;
   name: string;
   dataType: string;
-  auditLevels: number;
-  approvers: string;
+  levels: number;
+  nodes: string;
   status: string;
   remark?: string;
 }
@@ -150,8 +150,22 @@ const AuditProcess = () => {
         return opt ? opt.label : val;
       },
     },
-    { title: '审核层级', dataIndex: 'auditLevels', key: 'auditLevels', width: 100 },
-    { title: '审核人', dataIndex: 'approvers', key: 'approvers', ellipsis: true, width: 200 },
+    { title: '审核层级', dataIndex: 'levels', key: 'levels', width: 100 },
+    {
+      title: '审核人',
+      dataIndex: 'nodes',
+      key: 'nodes',
+      ellipsis: true,
+      width: 200,
+      render: (val: string) => {
+        try {
+          const nodes = JSON.parse(val);
+          return nodes.map((n: any) => n.roleName === 'editor' ? '数据录入员' : n.roleName === 'auditor' ? '审核员' : n.roleName).join(' → ');
+        } catch {
+          return val || '-';
+        }
+      },
+    },
     {
       title: '状态',
       dataIndex: 'status',
@@ -252,11 +266,11 @@ const AuditProcess = () => {
           <Form.Item name="dataType" label="数据类型" rules={[{ required: true, message: '请选择数据类型' }]}>
             <Select placeholder="请选择" options={dataTypeOptions} />
           </Form.Item>
-          <Form.Item name="auditLevels" label="审核层级" rules={[{ required: true, message: '请输入审核层级' }]}>
+          <Form.Item name="levels" label="审核层级" rules={[{ required: true, message: '请输入审核层级' }]}>
             <InputNumber style={{ width: '100%' }} min={1} max={10} placeholder="请输入审核层级" />
           </Form.Item>
-          <Form.Item name="approvers" label="审核人" rules={[{ required: true, message: '请输入审核人' }]}>
-            <Input placeholder="多个审核人用逗号分隔" />
+          <Form.Item name="nodes" label="审核人" rules={[{ required: true, message: '请输入审核人' }]}>
+            <Input placeholder='JSON格式,如[{"level":1,"roleName":"editor","timeout":24}]' />
           </Form.Item>
           <Form.Item name="status" label="状态" rules={[{ required: true, message: '请选择状态' }]}>
             <Select

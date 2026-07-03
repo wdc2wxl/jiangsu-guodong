@@ -27,9 +27,9 @@ interface BookingRule {
   id: number;
   name: string;
   targetType: string;
-  maxAdvanceDays: number;
-  maxDuration: number;
-  cancelDeadline: number;
+  advanceDays: number;
+  slotDuration: number;
+  cancelLimit: number;
   enabled: boolean;
   remark?: string;
 }
@@ -159,9 +159,9 @@ const BookingRules = () => {
         return opt ? opt.label : val;
       },
     },
-    { title: '最大提前天数', dataIndex: 'maxAdvanceDays', key: 'maxAdvanceDays', width: 120 },
-    { title: '最长时长(小时)', dataIndex: 'maxDuration', key: 'maxDuration', width: 130 },
-    { title: '取消截止(小时)', dataIndex: 'cancelDeadline', key: 'cancelDeadline', width: 130 },
+    { title: '最大提前天数', dataIndex: 'advanceDays', key: 'advanceDays', width: 120 },
+    { title: '最长时长(分钟)', dataIndex: 'slotDuration', key: 'slotDuration', width: 130, render: (v: number) => v ? `${v}分钟` : '-' },
+    { title: '取消截止(分钟)', dataIndex: 'cancelLimit', key: 'cancelLimit', width: 130, render: (v: number) => v ? `${v}分钟` : '-' },
     {
       title: '状态',
       dataIndex: 'enabled',

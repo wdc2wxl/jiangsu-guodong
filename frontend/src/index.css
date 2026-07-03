@@ -58,3 +58,58 @@ body {
   justify-content: space-between;
   align-items: center;
 }
+
+/* ========== 侧边栏菜单样式优化 ========== */
+/* 一级菜单项行高和字号 */
+.ant-menu-dark .ant-menu-item,
+.ant-menu-dark .ant-menu-submenu-title {
+  height: 52px !important;
+  line-height: 52px !important;
+  font-size: 15px !important;
+  font-weight: 500;
+  border-radius: 6px;
+  margin: 4px 10px !important;
+  width: calc(100% - 20px) !important;
+}
+
+/* 二级子菜单项行高和字号 */
+.ant-menu-dark .ant-menu-sub .ant-menu-item {
+  height: 44px !important;
+  line-height: 44px !important;
+  font-size: 14px !important;
+  font-weight: 400;
+  padding-left: 48px !important;
+  border-radius: 6px;
+  margin: 2px 10px !important;
+  width: calc(100% - 20px) !important;
+}
+
+/* 菜单图标 */
+.ant-menu-item .ant-menu-item-icon,
+.ant-menu-submenu-title .ant-menu-item-icon {
+  font-size: 18px !important;
+}
+
+/* 子菜单箭头 */
+.ant-menu-submenu-title .ant-menu-submenu-arrow {
+  right: 14px !important;
+}
+
+/* 菜单项选中态 */
+.ant-menu-dark .ant-menu-item-selected {
+  background: rgba(255, 255, 255, 0.12) !important;
+  font-weight: 600;
+}
+
+/* 菜单项悬停态 */
+.ant-menu-dark .ant-menu-item:hover,
+.ant-menu-dark .ant-menu-submenu-title:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Logo 区域随菜单字号微调 */
+.logo {
+  height: 40px;
+  margin: 16px 10px;
+  font-size: 20px;
+}

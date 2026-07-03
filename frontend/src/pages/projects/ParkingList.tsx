@@ -25,11 +25,11 @@ import Toolbar from '@/components/Toolbar';
 interface Parking {
   id: number;
   location: string;
-  projectName: string;
-  totalSpots: number;
-  reservable: number;
-  rentable: number;
-  feeStandard: string;
+  project?: { name: string };
+  totalSpaces: number;
+  bookableSpaces: number;
+  rentableSpaces: number;
+  priceStandard: string;
   region: string;
   status: string;
 }
@@ -159,7 +159,7 @@ const ParkingList = () => {
       const csvContent = [
         headers.join(','),
         ...list.map((item: any) =>
-          [item.location, item.projectName, item.totalSpots, item.reservable, item.rentable, item.feeStandard, item.region, statusMap[item.status]?.label || item.status].join(',')
+          [item.location, item.project?.name || '-', item.totalSpaces, item.bookableSpaces, item.rentableSpaces, item.priceStandard, item.region, statusMap[item.status]?.label || item.status].join(',')
         ),
       ].join('\n');
       const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -176,11 +176,11 @@ const ParkingList = () => {
 
   const columns: ColumnsType<Parking> = [
     { title: '位置', dataIndex: 'location', key: 'location', ellipsis: true, width: 180 },
-    { title: '所属工程', dataIndex: 'projectName', key: 'projectName', ellipsis: true, width: 150 },
-    { title: '总车位', dataIndex: 'totalSpots', key: 'totalSpots', width: 90 },
-    { title: '可预约', dataIndex: 'reservable', key: 'reservable', width: 90 },
-    { title: '可租赁', dataIndex: 'rentable', key: 'rentable', width: 90 },
-    { title: '收费标准', dataIndex: 'feeStandard', key: 'feeStandard', width: 140 },
+    { title: '所属工程', key: 'projectName', ellipsis: true, width: 150, render: (_, record) => record.project?.name || '-' },
+    { title: '总车位', dataIndex: 'totalSpaces', key: 'totalSpaces', width: 90 },
+    { title: '可预约', dataIndex: 'bookableSpaces', key: 'bookableSpaces', width: 90 },
+    { title: '可租赁', dataIndex: 'rentableSpaces', key: 'rentableSpaces', width: 90 },
+    { title: '收费标准', dataIndex: 'priceStandard', key: 'priceStandard', width: 140 },
     { title: '区域', dataIndex: 'region', key: 'region', width: 100 },
     {
       title: '状态',

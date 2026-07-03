@@ -27,13 +27,13 @@ import Toolbar from '@/components/Toolbar';
 interface Rental {
   id: number;
   rentalNo: string;
-  parkingLocation: string;
-  tenantName: string;
+  parking?: { location: string };
+  applicantName: string;
   phone: string;
   plateNumber: string;
   startDate: string;
   endDate: string;
-  monthlyFee: number;
+  leasePrice: number;
   status: string;
   remark?: string;
 }
@@ -184,7 +184,7 @@ const RentalList = () => {
       const csvContent = [
         headers.join(','),
         ...list.map((item: any) =>
-          [item.rentalNo, item.parkingLocation, item.tenantName, item.phone, item.plateNumber, item.startDate, item.endDate, item.monthlyFee, statusMap[item.status]?.label || item.status].join(',')
+          [item.rentalNo, item.parking?.location || '-', item.applicantName, item.phone, item.plateNumber, item.startDate, item.endDate, item.leasePrice, statusMap[item.status]?.label || item.status].join(',')
         ),
       ].join('\n');
       const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -201,9 +201,8 @@ const RentalList = () => {
 
   const columns: ColumnsType<Rental> = [
     { title: '租赁编号', dataIndex: 'rentalNo', key: 'rentalNo', width: 140 },
-    { title: '车位位置', dataIndex: 'parkingLocation', key: 'parkingLocation', ellipsis: true, width: 150 },
-    { title: '承租人', dataIndex: 'tenantName', key: 'tenantName', width: 100 },
-    { title: '车牌号', dataIndex: 'plateNumber', key: 'plateNumber', width: 110 },
+    { title: '车位位置', key: 'parkingLocation', ellipsis: true, width: 150, render: (_, record) => record.parking?.location || '-' },
+    { title: '承租人', dataIndex: 'applicantName', key: 'applicantName', width: 100 },
     {
       title: '开始日期',
       dataIndex: 'startDate',
@@ -220,8 +219,8 @@ const RentalList = () => {
     },
     {
       title: '月租金(元)',
-      dataIndex: 'monthlyFee',
-      key: 'monthlyFee',
+      dataIndex: 'leasePrice',
+      key: 'leasePrice',
       width: 110,
     },
     {
@@ -254,7 +253,7 @@ const RentalList = () => {
                   content: (
                     <div>
                       <p>租赁编号：{record.rentalNo}</p>
-                      <p>承租人：{record.tenantName}</p>
+                      <p>承租人：{record.applicantName}</p>
                       <p>车牌号：{record.plateNumber}</p>
                     </div>
                   ),
@@ -281,7 +280,7 @@ const RentalList = () => {
                   content: (
                     <div>
                       <p>租赁编号：{record.rentalNo}</p>
-                      <p>承租人：{record.tenantName}</p>
+                      <p>承租人：{record.applicantName}</p>
                       <p>车牌号：{record.plateNumber}</p>
                     </div>
                   ),
@@ -309,7 +308,7 @@ const RentalList = () => {
                   content: (
                     <div>
                       <p>租赁编号：{record.rentalNo}</p>
-                      <p>承租人：{record.tenantName}</p>
+                      <p>承租人：{record.applicantName}</p>
                       <p>车牌号：{record.plateNumber}</p>
                     </div>
                   ),
@@ -335,7 +334,7 @@ const RentalList = () => {
                   content: (
                     <div>
                       <p>租赁编号：{record.rentalNo}</p>
-                      <p>承租人：{record.tenantName}</p>
+                      <p>承租人：{record.applicantName}</p>
                       <p>车牌号：{record.plateNumber}</p>
                     </div>
                   ),
@@ -362,7 +361,7 @@ const RentalList = () => {
                 content: (
                   <div>
                     <p>租赁编号：{record.rentalNo}</p>
-                    <p>承租人：{record.tenantName}</p>
+                    <p>承租人：{record.applicantName}</p>
                     <p>车牌号：{record.plateNumber}</p>
                   </div>
                 ),
@@ -389,7 +388,7 @@ const RentalList = () => {
         <Form.Item name="rentalNo" label="租赁编号">
           <Input placeholder="请输入租赁编号" allowClear />
         </Form.Item>
-        <Form.Item name="tenantName" label="承租人">
+        <Form.Item name="applicantName" label="承租人">
           <Input placeholder="请输入承租人" allowClear />
         </Form.Item>
         <Form.Item name="plateNumber" label="车牌号">
@@ -438,7 +437,7 @@ const RentalList = () => {
           <Form.Item name="parkingLocation" label="车位位置" rules={[{ required: true, message: '请输入车位位置' }]}>
             <Input placeholder="请输入车位位置" />
           </Form.Item>
-          <Form.Item name="tenantName" label="承租人" rules={[{ required: true, message: '请输入承租人' }]}>
+          <Form.Item name="applicantName" label="承租人" rules={[{ required: true, message: '请输入承租人' }]}>
             <Input placeholder="请输入承租人" />
           </Form.Item>
           <Form.Item name="phone" label="联系电话" rules={[{ required: true, message: '请输入联系电话' }]}>
@@ -472,3 +471,4 @@ const RentalList = () => {
 };
 
 export default RentalList;
+

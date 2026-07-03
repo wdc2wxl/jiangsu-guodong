@@ -20,7 +20,7 @@ import Toolbar from '@/components/Toolbar';
 interface Reservation {
   id: number;
   reservationNo: string;
-  parkingLocation: string;
+  parking?: { location: string };
   userName: string;
   phone: string;
   plateNumber: string;
@@ -149,7 +149,7 @@ const ReservationList = () => {
       const csvContent = [
         headers.join(','),
         ...list.map((item: any) =>
-          [item.reservationNo, item.parkingLocation, item.userName, item.phone, item.plateNumber, item.startTime, item.endTime, statusMap[item.status]?.label || item.status].join(',')
+          [item.reservationNo, item.parking?.location || '-', item.userName, item.phone, item.plateNumber, item.startTime, item.endTime, statusMap[item.status]?.label || item.status].join(',')
         ),
       ].join('\n');
       const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -166,7 +166,7 @@ const ReservationList = () => {
 
   const columns: ColumnsType<Reservation> = [
     { title: '预约编号', dataIndex: 'reservationNo', key: 'reservationNo', width: 140 },
-    { title: '车位位置', dataIndex: 'parkingLocation', key: 'parkingLocation', ellipsis: true, width: 160 },
+    { title: '车位位置', key: 'parkingLocation', ellipsis: true, width: 160, render: (_, record) => record.parking?.location || '-' },
     { title: '预约人', dataIndex: 'userName', key: 'userName', width: 100 },
     { title: '车牌号', dataIndex: 'plateNumber', key: 'plateNumber', width: 110 },
     {
@@ -279,7 +279,7 @@ const ReservationList = () => {
         {detailRecord && (
           <Descriptions bordered column={2} size="small">
             <Descriptions.Item label="预约编号">{detailRecord.reservationNo}</Descriptions.Item>
-            <Descriptions.Item label="车位位置">{detailRecord.parkingLocation}</Descriptions.Item>
+            <Descriptions.Item label="车位位置">{detailRecord.parking?.location || '-'}</Descriptions.Item>
             <Descriptions.Item label="预约人">{detailRecord.userName}</Descriptions.Item>
             <Descriptions.Item label="联系电话">{detailRecord.phone}</Descriptions.Item>
             <Descriptions.Item label="车牌号">{detailRecord.plateNumber}</Descriptions.Item>

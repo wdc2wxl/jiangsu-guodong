@@ -4,11 +4,22 @@ import {
   Button,
   Modal,
   Tag,
-  Descriptions,
   message,
+  Row,
+  Col,
+  Avatar,
+  Divider,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { EyeOutlined } from '@ant-design/icons';
+import {
+  EyeOutlined,
+  UserOutlined,
+  FileTextOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  RollbackOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '@/services/api';
 import PageContainer from '@/components/PageContainer';
@@ -237,51 +248,199 @@ const AuditRecords = () => {
       </div>
 
       <Modal
-        title="审核记录详情"
+        title={
+          <div style={{ fontSize: 18, fontWeight: 600 }}>
+            <FileTextOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+            审核记录详情
+          </div>
+        }
         open={detailModalOpen}
         onCancel={() => setDetailModalOpen(false)}
-        footer={[<Button key="close" onClick={() => setDetailModalOpen(false)}>关闭</Button>]}
-        width={650}
+        footer={[
+          <Button key="close" type="primary" onClick={() => setDetailModalOpen(false)}>
+            关闭
+          </Button>,
+        ]}
+        width={580}
         destroyOnClose
+        maskStyle={{ background: 'rgba(0,0,0,0.5)' }}
+        centered
       >
         {detailRecord && (
-          <Descriptions bordered column={2} size="small">
-            <Descriptions.Item label="记录ID">{detailRecord.id}</Descriptions.Item>
-            <Descriptions.Item label="审核节点">第 {detailRecord.node || 1} 节点</Descriptions.Item>
-            <Descriptions.Item label="数据类型">
-              {dataTypeLabel(detailRecord.task?.dataType || '')}
-            </Descriptions.Item>
-            <Descriptions.Item label="数据摘要">
-              {detailRecord.task?.dataSummary || '-'}
-            </Descriptions.Item>
-            <Descriptions.Item label="审核人">
-              {detailRecord.auditor?.realName || detailRecord.auditor?.username || '-'}
-            </Descriptions.Item>
-            <Descriptions.Item label="审核时间">
-              {detailRecord.createdAt ? dayjs(detailRecord.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
-            </Descriptions.Item>
-            <Descriptions.Item label="审核结果">
-              {(() => {
-                const config = actionMap[detailRecord.action] || { label: detailRecord.action, color: 'default' };
-                return <Tag color={config.color}>{config.label}</Tag>;
-              })()}
-            </Descriptions.Item>
-            <Descriptions.Item label="任务状态">
-              {(() => {
-                const statusMap: Record<string, { label: string; color: string }> = {
-                  pending: { label: '待审核', color: 'blue' },
-                  approved: { label: '已通过', color: 'green' },
-                  returned: { label: '已退回', color: 'orange' },
-                  rejected: { label: '已驳回', color: 'red' },
-                };
-                const cfg = statusMap[detailRecord.task?.status] || { label: detailRecord.task?.status || '-', color: 'default' };
-                return <Tag color={cfg.color}>{cfg.label}</Tag>;
-              })()}
-            </Descriptions.Item>
-            <Descriptions.Item label="审核意见" span={2}>
-              {detailRecord.opinion || '-'}
-            </Descriptions.Item>
-          </Descriptions>
+          <div style={{ padding: '8px 0' }}>
+            {/* ========== 审核结果概览 ========== */}
+            <div
+              style={{
+                background: '#f6f8fc',
+                borderRadius: 10,
+                padding: '20px 24px',
+                marginBottom: 24,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: '#1a1a2e',
+                  marginBottom: 16,
+                  paddingLeft: 10,
+                  borderLeft: '3px solid #1890ff',
+                }}
+              >
+                审核结果
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  marginBottom: 20,
+                }}
+              >
+                <Avatar
+                  size={48}
+                  icon={<UserOutlined />}
+                  style={{
+                    background:
+                      actionMap[detailRecord.action]?.color === 'green'
+                        ? '#f6ffed'
+                        : actionMap[detailRecord.action]?.color === 'red'
+                          ? '#fff2f0'
+                          : '#fff7e6',
+                    color:
+                      actionMap[detailRecord.action]?.color === 'green'
+                        ? '#52c41a'
+                        : actionMap[detailRecord.action]?.color === 'red'
+                          ? '#ff4d4f'
+                          : '#fa8c16',
+                    fontSize: 22,
+                  }}
+                />
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: '#333', marginBottom: 4 }}>
+                    {detailRecord.auditor?.realName || detailRecord.auditor?.username || '-'}
+                  </div>
+                  <div style={{ fontSize: 13, color: '#999' }}>
+                    <ClockCircleOutlined style={{ marginRight: 4 }} />
+                    {detailRecord.createdAt
+                      ? dayjs(detailRecord.createdAt).format('YYYY-MM-DD HH:mm:ss')
+                      : '-'}
+                  </div>
+                </div>
+                <div style={{ marginLeft: 'auto' }}>
+                  {(() => {
+                    const config = actionMap[detailRecord.action] || {
+                      label: detailRecord.action,
+                      color: 'default',
+                    };
+                    const iconMap: Record<string, any> = {
+                      green: <CheckCircleOutlined />,
+                      orange: <RollbackOutlined />,
+                      red: <CloseCircleOutlined />,
+                    };
+                    return (
+                      <Tag
+                        color={config.color}
+                        style={{
+                          fontSize: 14,
+                          padding: '4px 14px',
+                          borderRadius: 12,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                      >
+                        {iconMap[config.color]}
+                        {config.label}
+                      </Tag>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {detailRecord.opinion && (
+                <div
+                  style={{
+                    background: '#fff',
+                    borderRadius: 8,
+                    padding: '14px 18px',
+                    fontSize: 14,
+                    color: '#555',
+                    fontStyle: 'italic',
+                    border: '1px solid #e8ecf4',
+                  }}
+                >
+                  "{detailRecord.opinion}"
+                </div>
+              )}
+            </div>
+
+            {/* ========== 关联任务信息 ========== */}
+            <div
+              style={{
+                background: '#f6f8fc',
+                borderRadius: 10,
+                padding: '20px 24px',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: '#1a1a2e',
+                  marginBottom: 16,
+                  paddingLeft: 10,
+                  borderLeft: '3px solid #1890ff',
+                }}
+              >
+                关联任务信息
+              </div>
+              <Row gutter={[24, 14]}>
+                <Col span={12}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>记录ID</div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: '#333' }}>
+                    {detailRecord.id}
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>审核节点</div>
+                  <div style={{ fontSize: 14, color: '#333' }}>
+                    第 {detailRecord.node || 1} 节点
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>数据类型</div>
+                  <div style={{ fontSize: 14, color: '#333' }}>
+                    {dataTypeLabel(detailRecord.task?.dataType || '')}
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>任务状态</div>
+                  <div style={{ fontSize: 14, color: '#333' }}>
+                    {(() => {
+                      const statusMap: Record<string, { label: string; color: string }> = {
+                        pending: { label: '待审核', color: 'blue' },
+                        approved: { label: '已通过', color: 'green' },
+                        returned: { label: '已退回', color: 'orange' },
+                        rejected: { label: '已驳回', color: 'red' },
+                      };
+                      const cfg = statusMap[detailRecord.task?.status] || {
+                        label: detailRecord.task?.status || '-',
+                        color: 'default',
+                      };
+                      return <Tag color={cfg.color}>{cfg.label}</Tag>;
+                    })()}
+                  </div>
+                </Col>
+                <Col span={24}>
+                  <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>数据摘要</div>
+                  <div style={{ fontSize: 14, color: '#333' }}>
+                    {detailRecord.task?.dataSummary || '-'}
+                  </div>
+                </Col>
+              </Row>
+            </div>
+          </div>
         )}
       </Modal>
     </PageContainer>

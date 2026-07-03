@@ -156,9 +156,9 @@ async function main() {
 
   // 8. 警报音频
   const alarmAudios = [
-    { signalType: 'pre_alarm', fileName: '预先警报.mp3', filePath: '/uploads/alarms/pre_alarm.mp3', duration: 180, status: 'published' },
-    { signalType: 'air_raid', fileName: '空袭警报.mp3', filePath: '/uploads/alarms/air_raid.mp3', duration: 180, status: 'published' },
-    { signalType: 'all_clear', fileName: '解除警报.mp3', filePath: '/uploads/alarms/all_clear.mp3', duration: 180, status: 'published' },
+    { signalType: 'pre_alarm', fileName: '预先警报.mp3', filePath: '/uploads/alarms/pre_alarm.mp3', fileSize: 2048000, duration: 180, status: 'published' },
+    { signalType: 'air_raid', fileName: '空袭警报.mp3', filePath: '/uploads/alarms/air_raid.mp3', fileSize: 2048000, duration: 180, status: 'published' },
+    { signalType: 'all_clear', fileName: '解除警报.mp3', filePath: '/uploads/alarms/all_clear.mp3', fileSize: 2048000, duration: 180, status: 'published' },
   ];
 
   for (const a of alarmAudios) {
