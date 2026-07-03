@@ -34,17 +34,14 @@ app.use('/api/stats', require('./routes/stats').default);
 app.use('/api/system', require('./routes/system').default);
 app.use('/api/upload', require('./routes/upload').default);
 
-// 托管前端静态文件（开发模式用src/public，生产模式用dist/public）
-const isDev = process.env.NODE_ENV !== 'production';
-const publicPath = isDev
-  ? path.join(__dirname, '..', '..', 'frontend', 'dist')
-  : path.join(__dirname, 'public');
-app.use(express.static(publicPath));
-
-// SPA fallback：所有非API路由返回index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(publicPath, 'index.html'));
-});
+// 托管前端静态文件（仅本地开发时使用，Vercel 部署时由 frontend 服务处理）
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  const publicPath = path.join(__dirname, '..', '..', 'frontend', 'dist');
+  app.use(express.static(publicPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+  });
+}
 
 // 错误处理
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
