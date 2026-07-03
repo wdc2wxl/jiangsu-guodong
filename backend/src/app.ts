@@ -33,6 +33,7 @@ app.use('/api/booking', require('./routes/booking').default);
 app.use('/api/stats', require('./routes/stats').default);
 app.use('/api/system', require('./routes/system').default);
 app.use('/api/upload', require('./routes/upload').default);
+app.use('/api/init', require('./routes/init').default);
 
 // 托管前端静态文件（仅本地开发时使用，Vercel 部署时由 frontend 服务处理）
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
