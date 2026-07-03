@@ -10,6 +10,7 @@ import {
   InputNumber,
   Tag,
   message,
+  Descriptions,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
@@ -438,30 +439,30 @@ const ProjectList = () => {
       </Modal>
 
       <Modal
-        title="工程详情"
+        title={<div style={{ textAlign: 'center', fontSize: 16, fontWeight: 600 }}>工程详情</div>}
         open={detailModalOpen}
         onCancel={() => setDetailModalOpen(false)}
         footer={[<Button key="close" onClick={() => setDetailModalOpen(false)}>关闭</Button>]}
-        width={600}
+        width={560}
+        centered
       >
         {detailRecord && (
-          <div>
-            <p><strong>工程名称：</strong>{detailRecord.name}</p>
-            <p><strong>编号：</strong>{detailRecord.code}</p>
-            <p><strong>经度：</strong>{detailRecord.longitude}</p>
-            <p><strong>纬度：</strong>{detailRecord.latitude}</p>
-            <p><strong>面积：</strong>{detailRecord.area} ㎡</p>
-            <p><strong>建设类型：</strong>{detailRecord.buildType}</p>
-            <p><strong>区域：</strong>{detailRecord.region}</p>
-            <p><strong>管理单位：</strong>{detailRecord.manageUnit}</p>
-            <p>
-              <strong>状态：</strong>
+          <Descriptions bordered column={2} size="small" style={{ marginTop: 8 }}>
+            <Descriptions.Item label="工程名称" span={1}>{detailRecord.name}</Descriptions.Item>
+            <Descriptions.Item label="编号" span={1}>{detailRecord.code}</Descriptions.Item>
+            <Descriptions.Item label="经度" span={1}>{detailRecord.longitude}</Descriptions.Item>
+            <Descriptions.Item label="纬度" span={1}>{detailRecord.latitude}</Descriptions.Item>
+            <Descriptions.Item label="面积" span={1}>{detailRecord.area} m²</Descriptions.Item>
+            <Descriptions.Item label="建设类型" span={1}>{detailRecord.buildType}</Descriptions.Item>
+            <Descriptions.Item label="区域" span={1}>{detailRecord.region}</Descriptions.Item>
+            <Descriptions.Item label="管理单位" span={1}>{detailRecord.manageUnit}</Descriptions.Item>
+            <Descriptions.Item label="状态" span={2}>
               {(() => {
                 const config = statusMap[detailRecord.status] || { label: detailRecord.status, color: 'default' };
                 return <Tag color={config.color}>{config.label}</Tag>;
               })()}
-            </p>
-          </div>
+            </Descriptions.Item>
+          </Descriptions>
         )}
       </Modal>
     </PageContainer>
